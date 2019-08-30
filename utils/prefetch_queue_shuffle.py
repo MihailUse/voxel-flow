@@ -3,7 +3,8 @@ from __future__ import print_function
 import glob
 import numpy as np
 import os 
-import Queue
+# import Queue
+import queue
 import random
 import scipy
 from scipy import misc
