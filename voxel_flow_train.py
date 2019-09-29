@@ -95,9 +95,19 @@ def train(dataset_frame1, dataset_frame2, dataset_frame3):
 
     session_config = tf.compat.v1.ConfigProto()
     session_config.gpu_options.allow_growth = True
-    session_config.gpu_options.per_process_gpu_memory_fraction = 0.4
+    #session_config.gpu_options.per_process_gpu_memory_fraction = 0.4
     sess = tf.Session(config=session_config)
     sess.run(init)
+
+    # Restore checkpoint from file.
+    if FLAGS.pretrained_model_checkpoint_path:
+      assert tf.gfile.Exists(FLAGS.pretrained_model_checkpoint_path)
+      ckpt = tf.train.get_checkpoint_state(
+               FLAGS.pretrained_model_checkpoint_path)
+      restorer = tf.compat.v1.train.Saver()
+      restorer.restore(sess, ckpt.model_checkpoint_path)
+      print('%s: Pre-trained model restored from %s' %
+        (datetime.now(), ckpt.model_checkpoint_path))
 
     # Summary Writter
     # summary_writer = tf.train.SummaryWriter(
@@ -132,7 +142,7 @@ def train(dataset_frame1, dataset_frame2, dataset_frame3):
     # load_fn_frame3 = partial(dataset_frame3.process_func)
     # p_queue_frame3 = PrefetchQueue(load_fn_frame3, data_list_frame3, FLAGS.batch_size, shuffle=False, num_workers=num_workers)
 
-    for step in range(0, FLAGS.max_steps):
+    for step in range(65000, FLAGS.max_steps):
       batch_idx = step % epoch_num
       print(batch_idx)
 
@@ -218,7 +228,7 @@ def test(dataset_frame1, dataset_frame2, dataset_frame3):
     ##sess = tf.Session()
     session_config = tf.compat.v1.ConfigProto()
     session_config.gpu_options.allow_growth = True
-    session_config.gpu_options.per_process_gpu_memory_fraction = 0.4
+    #session_config.gpu_options.per_process_gpu_memory_fraction = 0.4
     sess = tf.Session(config=session_config)
 
     # Restore checkpoint from file.
@@ -279,7 +289,7 @@ def test(dataset_frame1, dataset_frame2, dataset_frame3):
 
 if __name__ == '__main__':
 
-  os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+  #os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
   if FLAGS.subset == 'train':
 
@@ -303,4 +313,4 @@ if __name__ == '__main__':
     ucf101_dataset_frame2 = dataset.Dataset(data_list_path_frame2)
     ucf101_dataset_frame3 = dataset.Dataset(data_list_path_frame3)
 
-    test(ucf101_dataset_frame1, ucf101_dataset_frame2, ucf101_dataset_frame3)
+    test(ucf101_dataset_frame1, ucf101_dataset_frame2, ucf101_dataset_frame3)
