@@ -10,9 +10,9 @@ events*
 .DS_Store
 
 # Checkpoints and Results
-./voxel_flow_checkpoints
-./voxel_flow_train_image
-./voxel_flow_test_image
+#./voxel_flow_checkpoints
+#./voxel_flow_train_image
+#./voxel_flow_test_image
 
 # Temp Files
 *~

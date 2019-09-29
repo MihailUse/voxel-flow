@@ -2,13 +2,13 @@ from __future__ import print_function
 
 import glob
 import numpy as np
-import os 
+import os
 # import Queue
 import queue
 import random
 import scipy
 from scipy import misc
-import threading 
+import threading
 
 class DummpyData(object):
   def __init__(self, data):
@@ -28,7 +28,7 @@ def prefetch_job(load_fn, prefetch_queue, data_list, shuffle, prefetch_size):
         random.shuffle(data_list)
       data = load_fn(data_list[data_count]) #Load your data here.
       if type(data) is list:
-        for data_point in data: 
+        for data_point in data:
           idx = random.randint(0, prefetch_size)
           dummy_data = DummpyData(data_point)
           prefetch_queue.put((idx, dummy_data), block=True)
@@ -45,7 +45,7 @@ def prefetch_job(load_fn, prefetch_queue, data_list, shuffle, prefetch_size):
     data_count = (data_count + 1) % total_count
 
 class PrefetchQueue(object):
-  def __init__(self, load_fn, data_list, batch_size=32, prefetch_size=None, shuffle=True, num_workers=4):
+  def __init__(self, load_fn, data_list, batch_size=16, prefetch_size=None, shuffle=True, num_workers=4):
     self.data_list = data_list
     self.shuffle = shuffle
     self.prefetch_size = prefetch_size
@@ -81,16 +81,16 @@ if __name__ == '__main__':
     return scipy.misc.imread(data_file_path)
 
   import time
-  data_path_pattern = '/home/VoxelFlow/dataset/ucf101/*.jpg' 
+  data_path_pattern = '/home/VoxelFlow/dataset/ucf101/*.jpg'
   data_list = glob.glob(data_path_pattern)  # dataset.read_data_list_file()
   load_fn = load_fn_example  # dataset.process_func()
   num_workers=2
-  batch_size = 32
-  
+  batch_size = 8
+
   # Prefetch IO.
   p_queue = PrefetchQueue(load_fn, data_list, batch_size, num_workers=num_workers)
   time.sleep(5)
-  print('Start') 
+  print('Start')
   import datetime
   a = datetime.datetime.now()
   for k in range(0,50):
@@ -103,13 +103,13 @@ if __name__ == '__main__':
 
   # Naive FILE IO
   import glob
-  data_list = glob.glob(data_path_pattern) 
+  data_list = glob.glob(data_path_pattern)
   a = datetime.datetime.now()
   for k in range(0,50):
     time.sleep(0.1)
     data_sub_list = data_list[k*batch_size:(k+1)*batch_size]
     im_list = [np.expand_dims(scipy.misc.imread(file_name),0) for file_name in data_sub_list]
-    X = np.concatenate(im_list,axis=0)  
+    X = np.concatenate(im_list,axis=0)
 
   b = datetime.datetime.now()
   delta = b - a

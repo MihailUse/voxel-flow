@@ -10,32 +10,32 @@ import tensorflow.contrib.slim as slim
 
 def bilinear_interp(im, x, y, name):
   """Perform bilinear sampling on im given x, y coordinates
-  
+
   This function implements the differentiable sampling mechanism with
   bilinear kernel. Introduced in https://arxiv.org/abs/1506.02025, equation
   (5).
- 
+
   x,y are tensors specfying normalized coorindates [-1,1] to sample from im.
   (-1,1) means (0,0) coordinate in im. (1,1) means the most bottom right pixel.
 
   Args:
-    im: Tensor of size [batch_size, height, width, depth] 
+    im: Tensor of size [batch_size, height, width, depth]
     x: Tensor of size [batch_size, height, width, 1]
     y: Tensor of size [batch_size, height, width, 1]
     name: String for the name for this opt.
   Returns:
     Tensor of size [batch_size, height, width, depth]
   """
-  with tf.variable_scope(name):
-    x = tf.reshape(x, [-1]) 
-    y = tf.reshape(y, [-1]) 
+  with tf.compat.v1.variable_scope(name):
+    x = tf.reshape(x, [-1])
+    y = tf.reshape(y, [-1])
 
     # constants
     num_batch = tf.shape(im)[0]
     _, height, width, channels = im.get_shape().as_list()
 
-    x = tf.to_float(x)
-    y = tf.to_float(y)
+    x = tf.cast(x, float)
+    y = tf.cast(y, float)
 
     height_f = tf.cast(height, 'float32')
     width_f = tf.cast(width, 'float32')
@@ -57,7 +57,7 @@ def bilinear_interp(im, x, y, name):
     y0 = tf.clip_by_value(y0, zero, max_y)
     y1 = tf.clip_by_value(y1, zero, max_y)
 
-    dim2 = width 
+    dim2 = width
     dim1 = width * height
 
     # Create base index
@@ -66,9 +66,9 @@ def bilinear_interp(im, x, y, name):
     base = tf.tile(base, [1, height * width])
     base = tf.reshape(base, [-1])
 
-    base_y0 = base + y0 * dim2 
-    base_y1 = base + y1 * dim2 
-    idx_a = base_y0 + x0 
+    base_y0 = base + y0 * dim2
+    base_y1 = base + y1 * dim2
+    idx_a = base_y0 + x0
     idx_b = base_y1 + x0
     idx_c = base_y0 + x1
     idx_d = base_y1 + x1
@@ -76,22 +76,22 @@ def bilinear_interp(im, x, y, name):
     # Use indices to look up pixels
     # im_flat = tf.reshape(im, tf.pack([-1, channels]))
     im_flat = tf.reshape(im, tf.stack([-1, channels]))
-    im_flat = tf.to_float(im_flat)
+    im_flat = tf.cast(im_flat, float)
     pixel_a = tf.gather(im_flat, idx_a)
     pixel_b = tf.gather(im_flat, idx_b)
     pixel_c = tf.gather(im_flat, idx_c)
     pixel_d = tf.gather(im_flat, idx_d)
 
-    # Interpolate the values 
-    x1_f = tf.to_float(x1)
-    y1_f = tf.to_float(y1)
+    # Interpolate the values
+    x1_f = tf.cast(x1, float)
+    y1_f = tf.cast(y1, float)
 
     wa = tf.expand_dims((x1_f - x) * (y1_f - y), 1)
     wb = tf.expand_dims((x1_f - x) * (1.0 - (y1_f - y)), 1)
     wc = tf.expand_dims((1.0 - (x1_f - x)) * (y1_f - y), 1)
     wd = tf.expand_dims((1.0 - (x1_f - x)) * (1.0 - (y1_f - y)), 1)
 
-    output = tf.add_n([wa*pixel_a, wb*pixel_b, wc*pixel_c, wd*pixel_d]) 
+    output = tf.add_n([wa*pixel_a, wb*pixel_b, wc*pixel_c, wd*pixel_d])
     # output = tf.reshape(output, shape=tf.pack([num_batch, height, width, channels]))
     output = tf.reshape(output, shape=tf.stack([num_batch, height, width, channels]))
     return output
@@ -99,7 +99,7 @@ def bilinear_interp(im, x, y, name):
 def meshgrid(height, width):
   """Tensorflow meshgrid function.
   """
-  with tf.variable_scope('meshgrid'):
+  with tf.compat.v1.variable_scope('meshgrid'):
     x_t = tf.matmul(
         #tf.ones(shape=tf.pack([height,1])),
         tf.ones(shape=tf.stack([height,1])),
@@ -117,11 +117,11 @@ def meshgrid(height, width):
     # grid_y = tf.reshape(y_t_flat, [1, height, width, 1])
     grid_x = tf.reshape(x_t_flat, [1, height, width])
     grid_y = tf.reshape(y_t_flat, [1, height, width])
-    return grid_x, grid_y 
+    return grid_x, grid_y
 
 def vae_gaussian_layer(network, is_train=True, scope='gaussian_layer'):
   """Implements a gaussian reparameterization vae layer"""
-  with tf.variable_scope(scope):
+  with tf.compat.v1.variable_scope(scope):
     z_mean, z_logvar = tf.split(3, 2, network)  # Split into mean and variance
     if is_train:
       eps = tf.random_normal(tf.shape(z_mean))
