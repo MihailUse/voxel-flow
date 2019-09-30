@@ -142,7 +142,7 @@ def train(dataset_frame1, dataset_frame2, dataset_frame3):
     # load_fn_frame3 = partial(dataset_frame3.process_func)
     # p_queue_frame3 = PrefetchQueue(load_fn_frame3, data_list_frame3, FLAGS.batch_size, shuffle=False, num_workers=num_workers)
 
-    for step in range(65000, FLAGS.max_steps):
+    for step in range(155000, FLAGS.max_steps):
       batch_idx = step % epoch_num
       print(batch_idx)
 
@@ -252,16 +252,15 @@ def test(dataset_frame1, dataset_frame2, dataset_frame3):
 
     i = 0
     PSNR = 0
-
     for id_img in range(0, data_size):
       # Load single data.
       line_image_frame1 = dataset_frame1.process_func(data_list_frame1[id_img])
       line_image_frame2 = dataset_frame2.process_func(data_list_frame2[id_img])
       line_image_frame3 = dataset_frame3.process_func(data_list_frame3[id_img])
 
-      batch_data_frame1 = [dataset_frame1.process_func(ll) for ll in data_list_frame1[0:63]]
-      batch_data_frame2 = [dataset_frame2.process_func(ll) for ll in data_list_frame2[0:63]]
-      batch_data_frame3 = [dataset_frame3.process_func(ll) for ll in data_list_frame3[0:63]]
+      batch_data_frame1 = [dataset_frame1.process_func(ll) for ll in data_list_frame1[0:7]]
+      batch_data_frame2 = [dataset_frame2.process_func(ll) for ll in data_list_frame2[0:7]]
+      batch_data_frame3 = [dataset_frame3.process_func(ll) for ll in data_list_frame3[0:7]]
 
       batch_data_frame1.append(line_image_frame1)
       batch_data_frame2.append(line_image_frame2)
@@ -271,8 +270,7 @@ def test(dataset_frame1, dataset_frame2, dataset_frame3):
       batch_data_frame2 = np.array(batch_data_frame2)
       batch_data_frame3 = np.array(batch_data_frame3)
 
-      feed_dict = {input_placeholder: np.concatenate((batch_data_frame1, batch_data_frame3), 3),
-                    target_placeholder: batch_data_frame2}
+      feed_dict = {input_placeholder: np.concatenate((batch_data_frame1, batch_data_frame3), 3), target_placeholder: batch_data_frame2}
       # Run single step update.
       prediction_np, target_np, loss_value = sess.run([prediction,
                                                       target_placeholder,
@@ -285,11 +283,11 @@ def test(dataset_frame1, dataset_frame2, dataset_frame3):
       imwrite(file_name_label, target_np[-1,:,:,:])
       i += 1
       PSNR += 10*np.log10(255.0*255.0/np.sum(np.square(prediction_np-target_np)))
-    print("Overall PSNR: %f db" % (PSNR/len(data_list)))
+    print("Overall PSNR: %f db" % (PSNR/data_size))
 
 if __name__ == '__main__':
 
-  #os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+  os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
   if FLAGS.subset == 'train':
 
@@ -313,4 +311,4 @@ if __name__ == '__main__':
     ucf101_dataset_frame2 = dataset.Dataset(data_list_path_frame2)
     ucf101_dataset_frame3 = dataset.Dataset(data_list_path_frame3)
 
-    test(ucf101_dataset_frame1, ucf101_dataset_frame2, ucf101_dataset_frame3)
+    test(ucf101_dataset_frame1, ucf101_dataset_frame2, ucf101_dataset_frame3)
