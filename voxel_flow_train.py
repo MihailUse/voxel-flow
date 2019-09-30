@@ -257,7 +257,8 @@ def test(dataset_frame1, dataset_frame2, dataset_frame3):
       line_image_frame1 = dataset_frame1.process_func(data_list_frame1[id_img])
       line_image_frame2 = dataset_frame2.process_func(data_list_frame2[id_img])
       line_image_frame3 = dataset_frame3.process_func(data_list_frame3[id_img])
-
+      print(line_image_frame1)
+      exit()
       batch_data_frame1 = [dataset_frame1.process_func(ll) for ll in data_list_frame1[0:7]]
       batch_data_frame2 = [dataset_frame2.process_func(ll) for ll in data_list_frame2[0:7]]
       batch_data_frame3 = [dataset_frame3.process_func(ll) for ll in data_list_frame3[0:7]]
