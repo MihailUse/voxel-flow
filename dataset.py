@@ -3,7 +3,8 @@ from utils.image_utils import imread, imsave
 
 #DATA_PATH_BASE = '/home/VoxelFlow/dataset/ucf101_triplets/'
 #DATA_PATH_BASE = 'F:/Users/Makoto/Work/GitHub/voxel-flow/data/'
-DATA_PATH_BASE = './data/'
+#DATA_PATH_BASE = './data/'
+DATA_PATH_BASE = './data_hd/'
 
 class Dataset(object):
   def __init__(self, data_list_file=None, process_func=None):

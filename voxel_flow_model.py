@@ -68,6 +68,10 @@ class Voxel_flow_model(object):
     flow = net[:, :, :, 0:2]
     mask = tf.expand_dims(net[:, :, :, 2], 3)
 
+    # net -> Tensor("conv7/Tanh:0", shape=(?, 256, 256, 3), dtype=float32)
+    # flow-> Tensor("strided_slice:0", shape=(?, 256, 256, 2), dtype=float32)
+    # mask-> Tensor("ExpandDims:0", shape=(?, 256, 256, 1), dtype=float32)
+
     grid_x, grid_y = meshgrid(256, 256)
     grid_x = tf.tile(grid_x, [8, 1, 1]) # batch_size = 32
     grid_y = tf.tile(grid_y, [8, 1, 1]) # batch_size = 32
@@ -88,4 +92,5 @@ class Voxel_flow_model(object):
     # net = tf.mul(mask, output_1) + tf.mul(1.0 - mask, output_2)
     net = tf.multiply(mask, output_1) + tf.multiply(1.0 - mask, output_2)
 
+    #exit()
     return net
