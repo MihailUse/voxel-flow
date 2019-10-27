@@ -100,6 +100,7 @@ def train(dataset_frame1, dataset_frame2, dataset_frame3):
     sess.run(init)
 
     # Restore checkpoint from file.
+    '''
     if FLAGS.pretrained_model_checkpoint_path:
       assert tf.gfile.Exists(FLAGS.pretrained_model_checkpoint_path)
       ckpt = tf.train.get_checkpoint_state(
@@ -108,6 +109,7 @@ def train(dataset_frame1, dataset_frame2, dataset_frame3):
       restorer.restore(sess, ckpt.model_checkpoint_path)
       print('%s: Pre-trained model restored from %s' %
         (datetime.now(), ckpt.model_checkpoint_path))
+    '''
 
     # Summary Writter
     # summary_writer = tf.train.SummaryWriter(
@@ -142,7 +144,9 @@ def train(dataset_frame1, dataset_frame2, dataset_frame3):
     # load_fn_frame3 = partial(dataset_frame3.process_func)
     # p_queue_frame3 = PrefetchQueue(load_fn_frame3, data_list_frame3, FLAGS.batch_size, shuffle=False, num_workers=num_workers)
 
-    for step in range(155000, FLAGS.max_steps):
+    fill = np.zeros([8, 320])
+
+    for step in range(0, FLAGS.max_steps):
       batch_idx = step % epoch_num
       print(batch_idx)
 
@@ -161,6 +165,8 @@ def train(dataset_frame1, dataset_frame2, dataset_frame3):
       # batch_data_frame2 = p_queue_frame2.get_batch()
       # batch_data_frame3 = p_queue_frame3.get_batch()
       #print(batch_data_frame1.shape, batch_data_frame2.shape, batch_data_frame3.shape)
+      #exit()
+
 
       feed_dict = {input_placeholder: np.concatenate((batch_data_frame1, batch_data_frame3), 3), target_placeholder: batch_data_frame2}
 
@@ -214,7 +220,7 @@ def test(dataset_frame1, dataset_frame2, dataset_frame3):
     # target_resized = tf.image.resize_area(target_placeholder,[128, 128])
 
     # Prepare model.
-    model = Voxel_flow_model(is_train=True)
+    model = Voxel_flow_model(is_train=False)
     prediction = model.inference(input_placeholder)
     # reproduction_loss, prior_loss = model.loss(prediction, target_placeholder)
     reproduction_loss = model.loss(prediction, target_placeholder)
@@ -257,8 +263,8 @@ def test(dataset_frame1, dataset_frame2, dataset_frame3):
       line_image_frame1 = dataset_frame1.process_func(data_list_frame1[id_img])
       line_image_frame2 = dataset_frame2.process_func(data_list_frame2[id_img])
       line_image_frame3 = dataset_frame3.process_func(data_list_frame3[id_img])
-      print(line_image_frame1)
-      exit()
+      #print(line_image_frame1)
+      #exit()
       batch_data_frame1 = [dataset_frame1.process_func(ll) for ll in data_list_frame1[0:7]]
       batch_data_frame2 = [dataset_frame2.process_func(ll) for ll in data_list_frame2[0:7]]
       batch_data_frame3 = [dataset_frame3.process_func(ll) for ll in data_list_frame3[0:7]]
@@ -304,9 +310,12 @@ if __name__ == '__main__':
 
   elif FLAGS.subset == 'test':
 
-    data_list_path_frame1 = "data_list/ucf101_test_files_frame1.txt"
-    data_list_path_frame2 = "data_list/ucf101_test_files_frame2.txt"
-    data_list_path_frame3 = "data_list/ucf101_test_files_frame3.txt"
+    #data_list_path_frame1 = "data_list/ucf101_test_files_frame1.txt"
+    #data_list_path_frame2 = "data_list/ucf101_test_files_frame2.txt"
+    #data_list_path_frame3 = "data_list/ucf101_test_files_frame3.txt"
+    data_list_path_frame1 = "data_list/baseball_test_files_frame1.txt"
+    data_list_path_frame2 = "data_list/baseball_test_files_frame2.txt"
+    data_list_path_frame3 = "data_list/baseball_test_files_frame3.txt"
 
     ucf101_dataset_frame1 = dataset.Dataset(data_list_path_frame1)
     ucf101_dataset_frame2 = dataset.Dataset(data_list_path_frame2)
