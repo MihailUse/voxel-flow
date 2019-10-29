@@ -144,8 +144,6 @@ def train(dataset_frame1, dataset_frame2, dataset_frame3):
     # load_fn_frame3 = partial(dataset_frame3.process_func)
     # p_queue_frame3 = PrefetchQueue(load_fn_frame3, data_list_frame3, FLAGS.batch_size, shuffle=False, num_workers=num_workers)
 
-    fill = np.zeros([8, 320])
-
     for step in range(0, FLAGS.max_steps):
       batch_idx = step % epoch_num
       print(batch_idx)

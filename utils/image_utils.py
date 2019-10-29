@@ -13,6 +13,8 @@ def imread(filename):
   """
   im = sp.misc.imread(filename)
   # return im / 255.0
+  im = im[:, 40:280, :]
+  im = np.array(Image.fromarray(im).resize((256, 256)))
   return im / 127.5 - 1.0
 
 
@@ -39,10 +41,10 @@ def imwrite(filename, np_image):
 def imwrite_batch(filenames, np_images):
   """Save batch images to file.
   Args:
-    filenames: 
+    filenames:
   """
   #TODO
-  pass 
+  pass
 
 def imresize(np_image, new_dims):
   """Image resize similar to Matlab.
@@ -57,7 +59,7 @@ def imresize(np_image, new_dims):
   """
   # im = np.uint8(np_image*255)
   im = np.uint8((np_image+1.0)*127.5)
-  im = Image.fromarray(im) 
+  im = Image.fromarray(im)
   new_height, new_width = new_dims
   im = im.resize((new_width, new_height), Image.ANTIALIAS)
   return np.array(im)
